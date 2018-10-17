@@ -1,0 +1,26 @@
+#
+# Cookbook:: mariadb
+# Recipe:: default
+#
+# Copyright:: 2018, The Authors, All Rights Reserved.
+node['mariadb']['server']['packages'].each do |name|
+package name  do 
+ action :install
+end
+end
+service 'mariadb' do
+action [:enable, :start]
+end
+template '/etc/config.sql' do
+  source 'confif.erb'
+  owner  'root'
+  group  'root'
+  mode   '0600'
+  action :create
+  notifies :run, 'execute[install-grants]', :immediately
+end
+execute 'install-scripts' do
+  command mysql </etc/config.sql
+  notifies :restart, 'service[mariadb]', :immediately
+en
+
